@@ -1,0 +1,6 @@
+Title: Diabetes - Possible Indicators & Risk
+
+Source: https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data
+
+Write-Up: Diabetes Health Indicators Dataset is a open dataset on kaggle, and through analyzing it. Through this project, I am hoping to create a series of interactive and exploratory visualizations focusing on the possible links between various health indicators, lifestyle factors, and diabetes risks. First, I plan to show how many people within this population have type 1 or type 2 diabetes using a pie chart. Second, I aim to create a correlation matrix or chart to highlight which health factors have the strongest correlations with diabetes. This will allow the audience to easily identify and explore these relationships, with the added feature of hovering over cells in the matrix to display exact correlation coefficients. Third, I plan to use a bar graph to show how diabetes prevalence varies by demographic or lifestyle factors, providing additional context. Lastly, I hope to develop a diabetes risk calculator that estimates possible risk based on lifestyle and health factors. Although this may be challenging, I am hoping it would work. 
+

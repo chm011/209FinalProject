@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demographic Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <script src="script.js" defer></script>
+
+    <style>
+        .tooltip {
+            position: absolute;
+            background: #f9f9f9;
+            border: 1px solid #d3d3d3;
+            padding: 20px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        svg {
+            font-family: Inter, sans-serif;
+            padding: 20px;
+        }
+        html{
+            font-family: Inter, sans-serif;
+            font-feature-settings: 'liga' 1, 'calt' 1;
+        }
+
+
+        h1,h2,h3{
+            text-align: left;
+            padding: 20px;
+        }
+        text {
+            font-family: 'Inter', sans-serif;
+}
+
+        .axis text {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            fill: #444;
+        }
+
+        .tooltip {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .title {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            fill: #222;
+            text-anchor: middle;
+        }
+        #risk-output {
+        max-width: 600px;
+        background: #ffffff;
+        border-radius: 5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 35px;
+        text-align: left;
+    }
+
+    .summary p {
+        font-size: 1.5em;
+        margin: 10px 0;
+        font-weight: 600;
+    }
+    .slider-container {
+        padding-left: 35px;
+        padding-bottom: 10px;
+    }
+
+    #toggle-breakdown-btn {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 10px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #toggle-breakdown-btn:hover {
+        background-color: #0056b3;
+    }
+
+    #breakdown-container {
+        display: none;
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    h3 {
+        font-size: 1.2em;
+        color: #444;
+        margin-bottom: 10px;
+    }
+
+    ul#breakdown-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    ul#breakdown-list li {
+        background: #f9f9f9;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        font-size: 0.9em;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    ul#breakdown-list li span {
+        font-weight: 600;
+        color: #007BFF;
+    }
+
+    ul#breakdown-list li small {
+        color: #666;
+    }
+    </style>
+</head>
+
+
+
+<body>
+    <h1>Diabaetes Health Indicators (2014)</h1>
+    <br></br>
+    <h2>Diabetes Prevalence by General Demographic</h2>
+    <div style = "padding: 20px;">
+        <label for="demographic">Select Demographic:</label>
+        <select id="demographic">
+            <option value="Education">Education</option>
+            <option value="Income">Income</option>
+            <option value="Age">Age</option>
+            <option value="Sex">Sex</option>
+        </select>
+    </div>
+    <svg width="800" height="500"></svg>
+    <div class="tooltip" style="opacity: 0;"></div>
+<br></br>
+<br></br>
+
+
+<!--TBD to be in project or not
+<h2>Diabetes Prevalence by Health </h2>
+<div>
+    <label for="demographic">Select Demographic:</label>
+    <select id="demographic">
+        <option value="Education">Education</option>
+        <option value="Income">Income</option>
+        <option value="Age">Age</option>
+        <option value="Sex">Sex</option>
+    </select>
+</div>
+<svg width="800" height="500"></svg>
+<div class="tooltip" style="opacity: 0;"></div>
+<script src="script.js"></script>
+-->
+
+
+<br></br>
+
+
+
+
+<!--Diabetes Risk Calculator-->  
+<h2>Diabetes Risk Calculator</h2>
+</div>
+
+<!-- Dropdown and Sliders -->
+<div class="slider-container">
+    <label for="sex-dropdown">Sex:</label>
+    <select id="sex-dropdown">
+        <option value="0">Female</option>
+        <option value="1">Male</option>
+    </select>
+</div>
+<div class="slider-container">
+    <label for="age-slider">Age: <span id="age-value">30</span></label>
+    <input type="range" id="age-slider" min="18" max="120" value="30">
+</div>
+<div class="slider-container">
+    <label for="bmi-slider">BMI: <span id="bmi-value">25.0</span></label>
+    <input type="range" id="bmi-slider" min="10" max="50" value="25.0" step="0.1">
+</div>
+<div class="slider-container">
+    <label for="high-bp-dropdown">High Blood Pressure:</label>
+    <select id="high-bp-dropdown">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select>
+</div>
+<div class="slider-container">
+    <label for="high-chol-dropdown">High Cholesterol:</label>
+    <select id="high-chol-dropdown">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select>
+</div>
+<div class="slider-container">
+    <label for="smoker-dropdown">Smoker:</label>
+    <select id="smoker-dropdown">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select>
+</div>
+<div class="slider-container">
+    <label for="heart-disease-dropdown">Heart Disease or Attack:</label>
+    <select id="heart-disease-dropdown">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select>
+</div>
+<div class="slider-container">
+    <label for="phys-activity-dropdown">Physical Activity:</label>
+    <select id="phys-activity-dropdown">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select>
+</div>
+<div class="slider-container">
+    <label for="gen-health-slider">General Health: (1 is the best)<span id="gen-health-value">3</span></label>
+    <input type="range" id="gen-health-slider" min="1" max="5" value="3">
+</div>
+<div class="slider-container">
+    <label for="ment-health-slider">Mental Health (Days in Poor Health): <span id="ment-health-value">0</span></label>
+    <input type="range" id="ment-health-slider" min="0" max="30" value="0">
+</div>
+<div class="slider-container">
+    <label for="phys-health-slider">Physical Health (Days in Poor Health): <span id="phys-health-value">0</span></label>
+    <input type="range" id="phys-health-slider" min="0" max="30" value="0">
+</div>
+<div class="slider-container">
+    <label for="diff-walk-dropdown">Difficulty Walking:</label>
+    <select id="diff-walk-dropdown">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select>
+</div>
+<div class="slider-container">
+    <label for="fruits-dropdown">Consumes Fruits Daily:</label>
+    <select id="fruits-dropdown">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select>
+</div>
+<div>
+<!-- Risk Result -->
+
+<div id="risk-output">
+    <div id="risk-result"></div>
+    <div id="risk-score"></div>
+    <br></br>
+    <button id="toggle-breakdown-btn">Expand to See More</button>
+    <div id="breakdown-container" style="display: none;">
+        <h4>Breakdown by Factor:</h4>
+        <ul id="breakdown-list" style="font-size: 13px;"></ul>
+    </div>
+</div>
+<br></br>
+<br></br>
+<h3>Write Up for Prototype:</h3>
+<p style="font-size: 14px;padding: 20px;">
+    I chose this diabaetes dataset from the UCI respository which sourced from a kaggle dataset. I am interested in what these data will show, and how accurate the anayltic results are when compared to the real word.
+    <br></br>
+    In the prototype, two visualizations are done so far. 
+    <br></br>
+    The first one showing the diabetes prevalence rate among the dataset, which were based off of 70,692 survey responses. This was done to give an overall idea to what the demographics looks like in terms of age, sex, income, and education, and also to see the distrubution of just the demographics itself. I chose to just include age and sex for a general idea, and included income and education, because I thought it would be an interesting data to look at, even though it isn't generally seen as an heavily impacting factor in the clinical world, especially since comparing to lifestyle factors ad physical health factors.  There is a filter that audience can select to choose which demograhpic they wish to see, and when hovering over bars, it will show the exact counts of people with or without diabetes in each subgroup and how many people are in each subgroup.   
+    <br></br>
+    The difficulty of this mainly due to the bar heights, whenever I am trying adjust the colors to reflect having diabetes or not, the bar heights keep jumping to 100% to account for the diabetes percentage to be 100%, instead of the subgroup population I was tryign to show. 
+    <br></br>
+    The second one is a diabetes risk calculator. I processed the data to find prevalence rate of each categories and subgroups, and turned it into a scoring system. Each prevalence rate for each factor is turned into a risk score using a predefined threshhold. Then, I further processed the data to find correlation coefficients help me weigh which factors are more influencing. That integrated that into the calculator to weighted risk scores through  multiplying the weight by the risk score. The weighted scores are then summed, averaged, and converted into the percentage to show the overall risk for diabetes. I believe machine learning would have been a better approach to calculate scores, as the scores right now are still false high, and doesn't reflect nor can be used in real-wrod. But due to the limited time factor,  to write an API and integrate it into the graph will be far too complex. 
+    <br></br>
+    For this calculator, importing the json file and adjusting to make it work took a tremendous time as it was my first time implementing. The data won't load or the calculator wouldn't work dynamically. It took a lot of tries for it to finally work. And to design and figure out the a simple system that would work for the calculator was also challenging.
+    </p>
+<div>
+
+</div>
+</body>
+</html>
