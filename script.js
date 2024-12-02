@@ -194,15 +194,13 @@ const absCorrelationData = Object.fromEntries(
 );
 
 //transforming them into weights
-const totalCorrelationSum = Object.values(absCorrelationData).reduce((sum,value) => sum + value, 0);
 const weightsFromCorrelation = Object.fromEntries(
     Object.entries(absCorrelationData).map(([key, value]) => [
-        key,
-        (value / totalCorrelationSum) * 100
+        key,value
     ])
 );
 //debug check - good
-console.log("Normalized Weights (Summing to 1):", weightsFromCorrelation);
+console.log("Weights:", weightsFromCorrelation);
 
 
 // Fetch prevalence data
@@ -226,13 +224,7 @@ fetch('prevalence_data.json')
     });
 
 
-
-
-
-
-
-
-    document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
     console.log("DOMContentLoaded triggered!");
 });
 
@@ -242,8 +234,6 @@ function initializeCalculator() {
 
     initializeSliderUpdates();
     attachEventListeners(updateRisk);
-
-    // Perform the initial risk calculation
     updateRisk();
 }
 
@@ -280,6 +270,25 @@ function calculateRisk() {
     console.log("calculateRisk called!");
     console.log("Prevalence Data Debug:", prevalenceData);
 
+    const inputs = gatherInputValues();
+    const prevalenceRates = calculatePrevalenceRates(inputs);
+    console.log("Prevalence rates:",prevalenceRates);
+
+    const weightedRiskScores = calculateWeightedRiskScores(prevalenceRates);
+    console.log("Weighted Risk Scores:",weightedRiskScores)
+
+    const totalRawScore = weightedRiskScores.reduce((sum, { riskScore }) => sum + riskScore, 0);
+    const totalWeightedScore = weightedRiskScores.reduce((sum, { weightedScore }) => sum + weightedScore, 0);
+
+    const maxScorePerFactor = 25; // Assuming each factor contributes max score of 25
+    const overallRiskPercentage = Math.min(totalWeightedScore, 100);
+
+    return { overallRiskPercentage, totalRawScore, totalWeightedScore, weightedRiskScores };
+}
+
+
+
+function gatherInputValues(){    
     const ageSlider = document.getElementById("age-slider");
     const bmiSlider = document.getElementById("bmi-slider");
     const sexDropdown = document.getElementById("sex-dropdown");
@@ -294,27 +303,10 @@ function calculateRisk() {
     const diffWalkDropdown = document.getElementById("diff-walk-dropdown");
     const fruitsDropdown = document.getElementById("fruits-dropdown");
     
-    //mapping for keys 
-    const keyMapping = {
-        agePrevalence: "Age",
-        bmiPrevalence: "BMI",
-        sexPrevalence: "Sex",
-        smokerPrevalence: "Smoker",
-        highBPPrevalence: "HighBP",
-        highCholPrevalence: "HighChol",
-        heartDiseasePrevalence: "HeartDiseaseorAttack",
-        physActivityPrevalence: "PhysActivity",
-        genHlthPrevalence: "GenHlth",
-        mentHlthPrevalence: "MentHlth",
-        physHlthPrevalence: "PhysHlth",
-        diffWalkPrevalence: "DiffWalk",
-        fruitsPrevalence: "Fruits"
-    };
-    // Map inputs to JSON keys
-    const inputs = {
+    return {
         ageGroup: getAgeGroup(ageSlider.value),
         bmiGroup: getBMIGroup(bmiSlider.value),
-        sex: sexDropdown?.value + ".0", // Match JSON key format
+        sex: sexDropdown?.value + ".0", 
         smoker: smokerDropdown?.value + ".0",
         highBP: highBPDropdown?.value + ".0",
         highChol: highCholDropdown?.value + ".0",
@@ -326,79 +318,23 @@ function calculateRisk() {
         diffWalk: diffWalkDropdown?.value + ".0",
         fruits: fruitsDropdown?.value + ".0",
     };
-    console.log("Input values:", inputs);
-    // Fetch prevalence rates for each input
-    const prevalenceRates = {
-        agePrevalence: prevalenceData.Age?.[inputs.ageGroup] ?? 0,
-        bmiPrevalence: prevalenceData.BMI?.[inputs.bmiGroup] ?? 0,
-        sexPrevalence: prevalenceData.Sex?.[inputs.sex] ?? 0,
-        smokerPrevalence: prevalenceData.Smoker?.[inputs.smoker] ?? 0,
-        highBPPrevalence: prevalenceData.HighBP?.[inputs.highBP] ?? 0,
-        highCholPrevalence: prevalenceData.HighChol?.[inputs.highChol] ?? 0,
-        heartDiseasePrevalence: prevalenceData.HeartDiseaseorAttack?.[inputs.heartDisease] ?? 0,
-        physActivityPrevalence: prevalenceData.PhysActivity?.[inputs.physActivity] ?? 0,
-        genHlthPrevalence: prevalenceData.GenHlth?.[inputs.genHealth] ?? 0,
-        mentHlthPrevalence: prevalenceData.MentHlth?.[inputs.mentHealth] ?? 0,
-        physHlthPrevalence: prevalenceData.PhysHlth?.[inputs.physHealth] ?? 0,
-        diffWalkPrevalence: prevalenceData.DiffWalk?.[inputs.diffWalk] ?? 0,
-        fruitsPrevalence: prevalenceData.Fruits?.[inputs.fruits] ?? 0,
-    };
-    console.log("Prevalence rates:", prevalenceRates);
-
-    const weightsFromCorrelation = Object.fromEntries(
-        Object.entries(absCorrelationData).map(([key, value]) => [
-            key.trim().toLowerCase(),  // Normalize keys to lowercase for consistency
-            value / totalCorrelationSum
-        ])
-    );
-    
-    console.log("Normalized weightsFromCorrelation Object:", weightsFromCorrelation);
-    
-    // Convert prevalence rates to weighted risk scores
-    const weightedRiskScores = Object.entries(prevalenceRates).map(([key, prevalence]) => {
-        let rawKey = keyMapping[key]?.trim().toLowerCase();  // Normalize the key for lookup
-    
-        console.log(`Trying to access weight for key: '${rawKey}'`);
-    
-        // Log all available keys to compare
-        console.log("Available keys in weightsFromCorrelation:", Object.keys(weightsFromCorrelation));
-    
-        // Check if exact match exists in weightsFromCorrelation
-        if (!(rawKey in weightsFromCorrelation)) {
-            console.error(`No match found for key: '${rawKey}'`);
-            return { key, prevalence, weight: 0, riskScore: 0, weightedScore: 0 }; // Default values for missing keys
-        }
-    
-        const weight = weightsFromCorrelation[rawKey];
-        console.log(`Weight for ${rawKey}: ${weight}`); // Debug the weight value
-    
-        const riskScore = getRiskScore(prevalence);
-        const weightedScore = weight * riskScore;
-        return { key, prevalence, weight, riskScore, weightedScore };
-    });
-
-    console.log("Weighted Risk Scores:", weightedRiskScores);
-
-    // Calculate overall risk percentage
-    const totalRawScore = weightedRiskScores.reduce((sum, { riskScore }) => sum + riskScore, 0);
-    const totalWeightedScore = weightedRiskScores.reduce((sum, {weightedScore}) => sum + weightedScore, 0);
-    
-    const maxScorePerFactor = 20;
-    const maxWeightedScore = weightedRiskScores.length * maxScorePerFactor;
-    const overallRiskPercentage = (totalWeightedScore / maxWeightedScore) * 100;
-
-    return { overallRiskPercentage, totalRawScore, totalWeightedScore, weightedRiskScores };
 }
-
-// overall risk function
-function calculateOverallRisk(riskScores) {
-    const maxRiskScore = 20; // Maximum possible score per factor in the 20-point scale
-    const totalRisk = riskScores.reduce((sum, score) => sum + score, 0); // Sum of all weighted scores
-    const averageRisk = totalRisk / riskScores.length; // Average weighted risk score
-
-    // Convert the average risk score to a percentage
-    return (averageRisk / maxRiskScore) * 100;
-}
+//mapping for keys 
+const keyMapping = {
+    agePrevalence: "Age",
+    bmiPrevalence: "BMI",
+    sexPrevalence: "Sex",
+    smokerPrevalence: "Smoker",
+    highBPPrevalence: "HighBP",
+    highCholPrevalence: "HighChol",
+    heartDiseasePrevalence: "HeartDiseaseorAttack",
+    physActivityPrevalence: "PhysActivity",
+    genHlthPrevalence: "GenHlth",
+    mentHlthPrevalence: "MentHlth",
+    physHlthPrevalence: "PhysHlth",
+    diffWalkPrevalence: "DiffWalk",
+    fruitsPrevalence: "Fruits"
+   };
 
 const factorNames = {
     agePrevalence: "Age",
@@ -416,32 +352,64 @@ const factorNames = {
     fruitsPrevalence: "Consumes Fruits Daily"
 };
 
+function calculatePrevalenceRates(inputs) {
+    return {
+        agePrevalence: prevalenceData.Age?.[inputs.ageGroup] ?? 0,
+        bmiPrevalence: prevalenceData.BMI?.[inputs.bmiGroup] ?? 0,
+        sexPrevalence: prevalenceData.Sex?.[inputs.sex] ?? 0,
+        smokerPrevalence: prevalenceData.Smoker?.[inputs.smoker] ?? 0,
+        highBPPrevalence: prevalenceData.HighBP?.[inputs.highBP] ?? 0,
+        highCholPrevalence: prevalenceData.HighChol?.[inputs.highChol] ?? 0,
+        heartDiseasePrevalence: prevalenceData.HeartDiseaseorAttack?.[inputs.heartDisease] ?? 0,
+        physActivityPrevalence: prevalenceData.PhysActivity?.[inputs.physActivity] ?? 0,
+        genHlthPrevalence: prevalenceData.GenHlth?.[inputs.genHealth] ?? 0,
+        mentHlthPrevalence: prevalenceData.MentHlth?.[inputs.mentHealth] ?? 0,
+        physHlthPrevalence: prevalenceData.PhysHlth?.[inputs.physHealth] ?? 0,
+        diffWalkPrevalence: prevalenceData.DiffWalk?.[inputs.diffWalk] ?? 0,
+        fruitsPrevalence: prevalenceData.Fruits?.[inputs.fruits] ?? 0,
+    };
+}
+
+function calculateWeightedRiskScores(prevalenceRates) {
+    return Object.entries(prevalenceRates).map(([key, prevalence]) => {
+        const rawKey = keyMapping[key]?.trim();
+
+        if (!(rawKey in weightsFromCorrelation)) {
+            console.error(`No match found for key: '${rawKey}'`);
+            return { key, prevalence, weight: 0, riskScore: 0, weightedScore: 0 };
+        }
+
+        const weight = weightsFromCorrelation[rawKey];
+        console.log(`Weight for ${rawKey}: ${weight}`);
+
+        const riskScore = getRiskScore(prevalence);
+        const weightedScore = weight * riskScore;
+
+        return { key, prevalence, weight, riskScore, weightedScore };
+    });
+}
 
 
 function updateRisk() {
     try {
         const { overallRiskPercentage,totalRawScore, totalWeightedScore, weightedRiskScores } = calculateRisk();
 
-        // Define the maximum possible score (20 points per factor)
-        const maxScore = weightedRiskScores.length * 20;
+        // Define the maximum possible score
+        const maxScore = weightedRiskScores.length * 25;
 
         const riskResult = document.getElementById("risk-result");
         const riskScore = document.getElementById("risk-score");
+
         riskResult.innerHTML = `<strong>Your estimated diabetes risk is ${overallRiskPercentage.toFixed(2)}%.</strong>`;
-           
         riskScore.innerHTML = `
             <strong>Total Raw Score:</strong> ${totalRawScore} / ${maxScore} <br>
             <strong>Overall Risk Score(weighted) :</strong> ${totalWeightedScore} / ${maxScore}`;
 
         const breakdownList = document.getElementById("breakdown-list");
-        breakdownList.innerHTML = ""; // Clear previous entries
+        breakdownList.innerHTML = "";
 
         weightedRiskScores.forEach(({ key, prevalence, weight, riskScore, weightedScore }) => {
-            console.log(`Debug: ${key} -> Prevalence: ${prevalence}, Weight: ${weight}, Risk Score: ${riskScore}, Weighted Score: ${weightedScore}`);
-    
-            
             const listItem = document.createElement("li");
-
             const humanReadableKey = factorNames[key] || key;
 
             listItem.innerHTML = `
@@ -453,6 +421,11 @@ function updateRisk() {
             `;
             breakdownList.appendChild(listItem);
         });
+        console.log("Risk Updated Successfully!");
+    } catch (error) {
+        console.error("Error updating risk:", error);
+    }
+}
 
         // Attach toggle button functionality
         const toggleButton = document.getElementById("toggle-breakdown-btn");
@@ -470,10 +443,6 @@ function updateRisk() {
         };
 
         console.log("Risk Updated Successfully!");
-    } catch (error) {
-        console.error("Error updating risk:", error);
-    }
-}
 
 //more functions
 function getBMIGroup(bmi) {
@@ -496,9 +465,10 @@ function getAgeGroup(value) {
 }
 
 function getRiskScore(prevalence) {
-    if (prevalence <= 5) return 1;   // Very Low
-    if (prevalence <= 15) return 5;  // Low
-    if (prevalence <= 30) return 10; // Moderate
-    if (prevalence <= 50) return 15; // High
-    return 20; // Very High
+    if (prevalence <= 10) return 5;   // Low  
+    if (prevalence <= 20) return 10;  // Mid-range
+    if (prevalence <= 35) return 15;  // Moderate-high
+    if (prevalence <= 50) return 18;  // High
+    return 25; // Very High
 }
+
