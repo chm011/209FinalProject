@@ -37,62 +37,48 @@ text {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     color: #333;
+    background: #f9f9f9;
+    pointer-events: none;
+    border: 1px solid #d3d3d3;
 }
 
 .title {
     font-family: 'Inter', sans-serif;
-    font-size: 18px;
+    font-size: 2.5em;
     font-weight: bold;
-    fill: #222;
+    fill: #333;
+    margin-bottom: 0.5em;
     text-anchor: middle;
 }
-#risk-output {
-max-width: 600px;
-background: #ffffff;
-border-radius: 5px;
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-padding: 35px;
-text-align: left;
-}
 
-.summary p {
-font-size: 1.5em;
-margin: 10px 0;
-font-weight: 600;
+.subtitle{
+    font-size: 1.2em;
+    color: #666
 }
 
 
-.slider-container {
-padding-left: 35px;
-padding-bottom: 10px;
-font-size: 14px;
-}
 
-#toggle-breakdown-btn {
-background-color: #007BFF;
-color: white;
-border: none;
-border-radius: 5px;
-padding: 10px 10px;
-font-size: 1em;
-cursor: pointer;
-transition: background-color 0.3s ease;
-}
 
-#toggle-breakdown-btn:hover {
-background-color: #0056b3;
-}
-
+/* toggle,breakdown styles */
 #breakdown-container {
 display: none;
 margin-top: 20px;
 text-align: left;
+background: #f1f1f1;
+border-radius: 5px;
+padding: 15px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 h3 {
 font-size: 1.2em;
 color: #444;
 margin-bottom: 10px;
+}
+h4{
+    font-size: 1.2em;
+    color: #335c40;
+    margin-bottom: 10px;
 }
 
 ul#breakdown-list {
@@ -112,9 +98,143 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
 ul#breakdown-list li span {
 font-weight: 600;
-color: #007BFF;
+color: #466f4a;
 }
 
 ul#breakdown-list li small {
 color: #666;
+}
+
+body{
+    background-color: #f7f8f5;
+    color:#333;
+}
+
+
+/* card styling */
+.card{
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 1em;
+    width: 90%;
+    max-width: 600px;
+}
+
+/* slider styling */
+.slider-container {
+    padding-left: 35px;
+    padding-bottom: 10px;
+    font-size: 14px;
+    }
+    
+    .slider-container label{
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #335c40;
+    }
+    
+    input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 10px;
+        border-radius: 5px;
+        background: #c5d3c2;
+        outline: none;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #466f4a;
+        cursor: pointer;
+        box-shadow: 0 0 2px #000;
+    }
+    
+    input[type="range"]:hover {
+        background-color: #b8cdb6;
+    }
+    
+/* dropdown styling */
+select{
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #a9bba2;
+    background-color: #fff;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* button styling */
+.button, #toggle-breakdown-btn {
+    background-color: #466f4a;
+    color: #ffffff;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover, #toggle-breakdown-btn:hover {
+    background-color: #36583a;
+}
+
+
+/* risk results styling */
+#risk-output {
+    max-width: 600px;
+    background: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 35px;
+    text-align: left;
+    }
+
+.summary p {
+font-size: 1.5em;
+margin: 10px 0;
+font-weight: 600;
+}
+
+.result{
+    text-align: center;
+    margin: 2em;
+}
+
+.circular-progress {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: conic-gradient(#466f4a 50%, #e0e0e0 0deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.progress-value {
+    font-size: 1.5em;
+    color: #333;
+    position: absolute;
+}
+
+/* Improved Interactive States */
+button, select, input[type="range"] {
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+button:hover, select:hover, input[type="range"]:hover {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02);
 }

@@ -71,87 +71,92 @@
 </p>
 </div>
 
-<!-- Dropdown and Sliders -->
-<div class="slider-container">
-    <label for="sex-dropdown">Sex:</label>
-    <select id="sex-dropdown">
-        <option value="0">Female</option>
-        <option value="1">Male</option>
-    </select>
+
+<div class="card">
+    <!-- Dropdown and Sliders -->
+    <div class="slider-container">
+        <label for="sex-dropdown">Sex:</label>
+        <select id="sex-dropdown">
+            <option value="0">Female</option>
+            <option value="1">Male</option>
+        </select>
+    </div>
+    <div class="slider-container">
+        <label for="age-slider">Age: <span id="age-value">30</span></label>
+        <input type="range" id="age-slider" min="18" max="120" value="30">
+    </div>
+    <div class="slider-container">
+        <label for="bmi-slider">BMI: <span id="bmi-value">25.0</span></label>
+        <input type="range" id="bmi-slider" min="10" max="50" value="25.0" step="0.1">
+    </div>
+    <div class="slider-container">
+        <label for="high-bp-dropdown">High Blood Pressure:</label>
+        <select id="high-bp-dropdown">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+    </div>
+    <div class="slider-container">
+        <label for="high-chol-dropdown">High Cholesterol:</label>
+        <select id="high-chol-dropdown">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+    </div>
+    <div class="slider-container">
+        <label for="smoker-dropdown">Smoker:</label>
+        <select id="smoker-dropdown">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+    </div>
+    <div class="slider-container">
+        <label for="heart-disease-dropdown">Heart Disease or Attack:</label>
+        <select id="heart-disease-dropdown">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+    </div>
+    <div class="slider-container">
+        <label for="phys-activity-dropdown">Physical Activity:</label>
+        <select id="phys-activity-dropdown">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+    </div>
+    <div class="slider-container">
+        <label for="gen-health-slider">General Health (1 is the best): <span id="gen-health-value">3</span></label>
+        <input type="range" id="gen-health-slider" min="1" max="5" value="3">
+    </div>
+    <div class="slider-container">
+        <label for="ment-health-slider">Mental Health (Days in Poor Health): <span id="ment-health-value">0</span></label>
+        <input type="range" id="ment-health-slider" min="0" max="30" value="0">
+    </div>
+    <div class="slider-container">
+        <label for="phys-health-slider">Physical Health (Days in Poor Health): <span id="phys-health-value">0</span></label>
+        <input type="range" id="phys-health-slider" min="0" max="30" value="0">
+    </div>
+    <div class="slider-container">
+        <label for="diff-walk-dropdown">Difficulty Walking:</label>
+        <select id="diff-walk-dropdown">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+    </div>
+    <div class="slider-container">
+        <label for="fruits-dropdown">Consumes Fruits Daily:</label>
+        <select id="fruits-dropdown">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+    </div>
+    <button class="button" onclick="calculateRisk()">Calculate Risk</button>
 </div>
-<div class="slider-container">
-    <label for="age-slider">Age: <span id="age-value">30</span></label>
-    <input type="range" id="age-slider" min="18" max="120" value="30">
-</div>
-<div class="slider-container">
-    <label for="bmi-slider">BMI: <span id="bmi-value">25.0</span></label>
-    <input type="range" id="bmi-slider" min="10" max="50" value="25.0" step="0.1">
-</div>
-<div class="slider-container">
-    <label for="high-bp-dropdown">High Blood Pressure:</label>
-    <select id="high-bp-dropdown">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select>
-</div>
-<div class="slider-container">
-    <label for="high-chol-dropdown">High Cholesterol:</label>
-    <select id="high-chol-dropdown">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select>
-</div>
-<div class="slider-container">
-    <label for="smoker-dropdown">Smoker:</label>
-    <select id="smoker-dropdown">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select>
-</div>
-<div class="slider-container">
-    <label for="heart-disease-dropdown">Heart Disease or Attack:</label>
-    <select id="heart-disease-dropdown">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select>
-</div>
-<div class="slider-container">
-    <label for="phys-activity-dropdown">Physical Activity:</label>
-    <select id="phys-activity-dropdown">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select>
-</div>
-<div class="slider-container">
-    <label for="gen-health-slider">General Health (1 is the best): <span id="gen-health-value">3</span></label>
-    <input type="range" id="gen-health-slider" min="1" max="5" value="3">
-</div>
-<div class="slider-container">
-    <label for="ment-health-slider">Mental Health (Days in Poor Health): <span id="ment-health-value">0</span></label>
-    <input type="range" id="ment-health-slider" min="0" max="30" value="0">
-</div>
-<div class="slider-container">
-    <label for="phys-health-slider">Physical Health (Days in Poor Health): <span id="phys-health-value">0</span></label>
-    <input type="range" id="phys-health-slider" min="0" max="30" value="0">
-</div>
-<div class="slider-container">
-    <label for="diff-walk-dropdown">Difficulty Walking:</label>
-    <select id="diff-walk-dropdown">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select>
-</div>
-<div class="slider-container">
-    <label for="fruits-dropdown">Consumes Fruits Daily:</label>
-    <select id="fruits-dropdown">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select>
-</div>
+
 <div>
 <!-- Risk Result -->
 
-<div id="risk-output">
+<div id="risk-output" class="card">
     <div id="risk-result"></div>
     <div id="risk-score"></div>
     <br></br>
@@ -161,6 +166,17 @@
         <ul id="breakdown-list" style="font-size: 13px;"></ul>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
 <br></br>
 <br></br>
 <h3>Write Up for Prototype:</h3>

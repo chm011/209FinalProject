@@ -223,6 +223,19 @@ fetch('prevalence_data.json')
         console.error("Error during fetch:", error);
     });
 
+function updateCircularProgress(riskPercentage) {
+    const circularProgress = document.getElementById("circular-progress");
+    const progressValue = document.getElementById("progress-value");
+
+    const validRiskPercentage = Math.min(riskPercentage, 100);
+
+    circularProgress.style.background = `conic-gradient(
+        #466f4a ${validRiskPercentage * 3.6}deg,
+        #e0e0e0 ${validRiskPercentage * 3.6}deg
+    )`;
+
+    progressValue.textContent = `${validRiskPercentage.toFixed(2)}%`;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOMContentLoaded triggered!");
@@ -404,7 +417,7 @@ function updateRisk() {
         riskScore.innerHTML = `
             <strong>Total Raw Score:</strong> ${totalRawScore} / ${maxScore} <br>
             <strong>Overall Risk Score(weighted) :</strong> ${totalWeightedScore} / ${maxScore}`;
-
+        
         const breakdownList = document.getElementById("breakdown-list");
         breakdownList.innerHTML = "";
 
@@ -426,6 +439,8 @@ function updateRisk() {
         console.error("Error updating risk:", error);
     }
 }
+
+        
 
         // Attach toggle button functionality
         const toggleButton = document.getElementById("toggle-breakdown-btn");
