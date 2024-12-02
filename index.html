@@ -3,145 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demographic Visualization</title>
+    <title>Diabetes Health Indicators </title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel='stylesheet' href='style.css'> 
     <script src="script.js" defer></script>
 
-    <style>
-        .tooltip {
-            position: absolute;
-            background: #f9f9f9;
-            border: 1px solid #d3d3d3;
-            padding: 10px;
-            border-radius: 4px;
-            pointer-events: none;
-        }
-        svg {
-            font-family: Inter, sans-serif;
-            padding: 20px;
-        }
-        html{
-            font-family: Inter, sans-serif;
-            font-feature-settings: 'liga' 1, 'calt' 1;
-        }
-
-
-        h1,h2,h3{
-            text-align: left;
-            padding: 15px;
-        }
-        text {
-            font-family: 'Inter', sans-serif;
-}
-
-        .axis text {
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            fill: #444;
-        }
-
-        .tooltip {
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            color: #333;
-        }
-
-        .title {
-            font-family: 'Inter', sans-serif;
-            font-size: 18px;
-            font-weight: bold;
-            fill: #222;
-            text-anchor: middle;
-        }
-        #risk-output {
-        max-width: 600px;
-        background: #ffffff;
-        border-radius: 5px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        padding: 35px;
-        text-align: left;
-    }
-
-    .summary p {
-        font-size: 1.5em;
-        margin: 10px 0;
-        font-weight: 600;
-    }
-    .slider-container {
-        padding-left: 35px;
-        padding-bottom: 10px;
-    }
-
-    #toggle-breakdown-btn {
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 10px;
-        font-size: 1em;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    #toggle-breakdown-btn:hover {
-        background-color: #0056b3;
-    }
-
-    #breakdown-container {
-        display: none;
-        margin-top: 20px;
-        text-align: left;
-    }
-
-    h3 {
-        font-size: 1.2em;
-        color: #444;
-        margin-bottom: 10px;
-    }
-
-    ul#breakdown-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    ul#breakdown-list li {
-        background: #f9f9f9;
-        padding: 10px 15px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        font-size: 0.9em;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    ul#breakdown-list li span {
-        font-weight: 600;
-        color: #007BFF;
-    }
-
-    ul#breakdown-list li small {
-        color: #666;
-    }
-    </style>
 </head>
 
 
 
 <body>
-    <h1>Diabaetes Health Indicators (2014)</h1>
-        <p style="font-size: 14px;padding: 20px;">
-        Diabetes is a chronic disease that impact many people world wide, it's basically when you have hyperglycemia or high blood sugar. Typically if ur Hb1Ac is above 6.5% or your blood sugar is higher than 200mg/dL in more than 1 reading, you have diabetes. There are greater than 133 million Americans with diabetes or prediabetes, I think it's crucial to understnad the important facots that could increase our risk of getting it, and hence the following was done to help demonstrate that. 
+    <h1>Diabetes Health Indicators (2014)</h1>
+        <p style="font-size: 14px;padding: 0px 20px;">
+        Diabetes is a chronic disease that impact many people world wide. Being diagnosed with diabetes means you have hyperglycemia or high blood sugar. Typically diagnosis is made when someone's Hb1Ac is above 6.5% or  blood sugar is higher than 200mg/dL in more than 1 reading. There are greater than 133 million Americans with diabetes or prediabetes, which makes it more crucial to understand the important facors that could increase our risks of getting it. I believe that the following visualizations will bring us closer to understanding the factors that are related to it, and hence the following was done to help demonstrate those points. 
         <br></br>
-        Information Source: https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes
+        Information Source: <a href= "https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes"> https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes</a>
         <br></br>
-        Data Soruce: https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data?select=diabetes_012_health_indicators_BRFSS2015.csv
+        Data Soruce: <a href = "https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data?select=diabetes_012_health_indicators_BRFSS2015.csv">https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data?select=diabetes_012_health_indicators_BRFSS2015.csv </a>
     </p>
     <br></br>
     <h2>Diabetes Prevalence by General Demographic</h2>
-    <div style = "padding: 20px;">
+    <div style = "padding: 10px;">
         <label for="demographic">Select Demographic:</label>
         <select id="demographic">
             <option value="Education">Education</option>
@@ -180,7 +65,7 @@
 
 <!--Diabetes Risk Calculator-->  
 <h2>Diabetes Risk Calculator</h2>
-<p style="font-size: 14px;padding: 20px;">
+<p style="font-size: 14px;padding: 0px 20px;">
     This calculator was made based on a kaggle set. It is meant to give an idea based on the data, and its prevalence rate and risk calculated are not meant to be extrapolated, but only to understand the risk further. 
 
 </p>
@@ -238,7 +123,7 @@
     </select>
 </div>
 <div class="slider-container">
-    <label for="gen-health-slider">General Health: (1 is the best)<span id="gen-health-value">3</span></label>
+    <label for="gen-health-slider">General Health (1 is the best): <span id="gen-health-value">3</span></label>
     <input type="range" id="gen-health-slider" min="1" max="5" value="3">
 </div>
 <div class="slider-container">

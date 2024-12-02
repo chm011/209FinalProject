@@ -50,7 +50,6 @@ const tooltip = d3.select("body")
 function updateChart(demographic, data) {
     // Filter data
     const filteredData = data.filter(d => d.Demographic === demographic);
-    console.log(`Filtered Data for ${demographic}:`, filteredData);
 
     if (filteredData.length === 0) {
         console.error(`No data found for demographic: ${demographic}`);
@@ -89,14 +88,11 @@ function updateChart(demographic, data) {
         .keys(["Diabetes", "NonDiabetes"])
         .value((d, key) => (d[key] / 100) * d.Category_percentage)(filteredData);
 
-    console.log("Stacked Data:", stackedData);
 
     // Update scales
     xScale.domain(filteredData.map(d => d.Category));
     yScale.domain([0, d3.max(filteredData, d => d.Category_percentage)]);
 
-    console.log("X Scale Domain:", xScale.domain());
-    console.log("Y Scale Domain:", yScale.domain());
 
     // Update axes
     xAxisGroup.transition().call(d3.axisBottom(xScale))
@@ -157,8 +153,15 @@ function renderBars(stackedData, filteredData) {
     console.log("Rendering Complete for Demographic:", demographic);
 }
 
+
+
+
+
+
+
+
 //calculated separetly in python and exported into correlations.json, and copied here
-const rawData = {
+const correlationData = {
     Diabetes_binary: 1.0,
     GenHlth: 0.40761159849491824,
     HighBP: 0.3815155489073118,
@@ -182,26 +185,28 @@ const rawData = {
     Education: -0.17048063498806193,
     Income: -0.22444871496381727
 };
-
-// Normalize and scale raw data
-const minValue = Math.min(...Object.values(rawData));
-const maxValue = Math.max(...Object.values(rawData));
-
-// Create normalized and scaled weights
-const prevalenceWeights = Object.fromEntries(
-    Object.entries(rawData).map(([key, value]) => [
+//transform them into absolute value
+const absCorrelationData = Object.fromEntries(
+    Object.entries(correlationData).map(([key,value]) => [
         key,
-        (value - minValue) / (maxValue - minValue) // Normalize to a 0–1 range
+        Math.abs(value)
     ])
 );
 
-console.log("Prevalence Weights:", prevalenceWeights);
+//transforming them into weights
+const totalCorrelationSum = Object.values(absCorrelationData).reduce((sum,value) => sum + value, 0);
+const weightsFromCorrelation = Object.fromEntries(
+    Object.entries(absCorrelationData).map(([key, value]) => [
+        key,
+        (value / totalCorrelationSum) * 100
+    ])
+);
+//debug check - good
+console.log("Normalized Weights (Summing to 1):", weightsFromCorrelation);
 
-console.log("Script loaded!");
-
-let prevalenceData = {};
 
 // Fetch prevalence data
+let prevalenceData = {};
 fetch('prevalence_data.json')
     .then(response => {
         console.log("Fetch response received:", response);
@@ -220,11 +225,18 @@ fetch('prevalence_data.json')
         console.error("Error during fetch:", error);
     });
 
-document.addEventListener("DOMContentLoaded", () => {
+
+
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", () => {
     console.log("DOMContentLoaded triggered!");
 });
 
-// Initialize 
+// Initialize the calculator setup
 function initializeCalculator() {
     console.log("Initializing calculator...");
 
@@ -247,8 +259,6 @@ function initializeSliderUpdates() {
     sliders.forEach(({ id, valueId }) => {
         const slider = document.getElementById(id);
         const valueSpan = document.getElementById(valueId);
-
-        console.log(`Slider: ${id}`, slider);
         if (slider && valueSpan) {
             slider.addEventListener("input", () => {
                 valueSpan.textContent = slider.value;
@@ -262,7 +272,6 @@ function initializeSliderUpdates() {
 function attachEventListeners(updateRisk) {
     const inputs = document.querySelectorAll("input[type='range'], select");
     inputs.forEach(input => {
-        console.log("Attaching listener to:", input.id);
         input.addEventListener("input", updateRisk);
     });
 }
@@ -284,7 +293,23 @@ function calculateRisk() {
     const physHealthSlider = document.getElementById("phys-health-slider");
     const diffWalkDropdown = document.getElementById("diff-walk-dropdown");
     const fruitsDropdown = document.getElementById("fruits-dropdown");
-
+    
+    //mapping for keys 
+    const keyMapping = {
+        agePrevalence: "Age",
+        bmiPrevalence: "BMI",
+        sexPrevalence: "Sex",
+        smokerPrevalence: "Smoker",
+        highBPPrevalence: "HighBP",
+        highCholPrevalence: "HighChol",
+        heartDiseasePrevalence: "HeartDiseaseorAttack",
+        physActivityPrevalence: "PhysActivity",
+        genHlthPrevalence: "GenHlth",
+        mentHlthPrevalence: "MentHlth",
+        physHlthPrevalence: "PhysHlth",
+        diffWalkPrevalence: "DiffWalk",
+        fruitsPrevalence: "Fruits"
+    };
     // Map inputs to JSON keys
     const inputs = {
         ageGroup: getAgeGroup(ageSlider.value),
@@ -301,9 +326,7 @@ function calculateRisk() {
         diffWalk: diffWalkDropdown?.value + ".0",
         fruits: fruitsDropdown?.value + ".0",
     };
-
     console.log("Input values:", inputs);
-
     // Fetch prevalence rates for each input
     const prevalenceRates = {
         agePrevalence: prevalenceData.Age?.[inputs.ageGroup] ?? 0,
@@ -320,12 +343,35 @@ function calculateRisk() {
         diffWalkPrevalence: prevalenceData.DiffWalk?.[inputs.diffWalk] ?? 0,
         fruitsPrevalence: prevalenceData.Fruits?.[inputs.fruits] ?? 0,
     };
-
     console.log("Prevalence rates:", prevalenceRates);
 
+    const weightsFromCorrelation = Object.fromEntries(
+        Object.entries(absCorrelationData).map(([key, value]) => [
+            key.trim().toLowerCase(),  // Normalize keys to lowercase for consistency
+            value / totalCorrelationSum
+        ])
+    );
+    
+    console.log("Normalized weightsFromCorrelation Object:", weightsFromCorrelation);
+    
     // Convert prevalence rates to weighted risk scores
     const weightedRiskScores = Object.entries(prevalenceRates).map(([key, prevalence]) => {
-        const weight = prevalenceWeights[key] ?? 1; // Default weight is 1
+        let rawKey = keyMapping[key]?.trim().toLowerCase();  // Normalize the key for lookup
+    
+        console.log(`Trying to access weight for key: '${rawKey}'`);
+    
+        // Log all available keys to compare
+        console.log("Available keys in weightsFromCorrelation:", Object.keys(weightsFromCorrelation));
+    
+        // Check if exact match exists in weightsFromCorrelation
+        if (!(rawKey in weightsFromCorrelation)) {
+            console.error(`No match found for key: '${rawKey}'`);
+            return { key, prevalence, weight: 0, riskScore: 0, weightedScore: 0 }; // Default values for missing keys
+        }
+    
+        const weight = weightsFromCorrelation[rawKey];
+        console.log(`Weight for ${rawKey}: ${weight}`); // Debug the weight value
+    
         const riskScore = getRiskScore(prevalence);
         const weightedScore = weight * riskScore;
         return { key, prevalence, weight, riskScore, weightedScore };
@@ -334,14 +380,14 @@ function calculateRisk() {
     console.log("Weighted Risk Scores:", weightedRiskScores);
 
     // Calculate overall risk percentage
-    const overallRiskPercentage = calculateOverallRisk(
-        weightedRiskScores.map(({ weightedScore }) => weightedScore)
-    );
+    const totalRawScore = weightedRiskScores.reduce((sum, { riskScore }) => sum + riskScore, 0);
+    const totalWeightedScore = weightedRiskScores.reduce((sum, {weightedScore}) => sum + weightedScore, 0);
+    
+    const maxScorePerFactor = 20;
+    const maxWeightedScore = weightedRiskScores.length * maxScorePerFactor;
+    const overallRiskPercentage = (totalWeightedScore / maxWeightedScore) * 100;
 
-    // Calculate total risk score
-    const totalRiskScore = weightedRiskScores.reduce((sum, { riskScore }) => sum + riskScore, 0);
-
-    return { overallRiskPercentage, totalRiskScore, weightedRiskScores };
+    return { overallRiskPercentage, totalRawScore, totalWeightedScore, weightedRiskScores };
 }
 
 // overall risk function
@@ -370,9 +416,11 @@ const factorNames = {
     fruitsPrevalence: "Consumes Fruits Daily"
 };
 
+
+
 function updateRisk() {
     try {
-        const { overallRiskPercentage, totalRiskScore, weightedRiskScores } = calculateRisk();
+        const { overallRiskPercentage,totalRawScore, totalWeightedScore, weightedRiskScores } = calculateRisk();
 
         // Define the maximum possible score (20 points per factor)
         const maxScore = weightedRiskScores.length * 20;
@@ -380,20 +428,26 @@ function updateRisk() {
         const riskResult = document.getElementById("risk-result");
         const riskScore = document.getElementById("risk-score");
         riskResult.innerHTML = `<strong>Your estimated diabetes risk is ${overallRiskPercentage.toFixed(2)}%.</strong>`;
-        riskScore.innerHTML = `<strong>Overall Risk Score:</strong> ${totalRiskScore} / ${maxScore}`;
+           
+        riskScore.innerHTML = `
+            <strong>Total Raw Score:</strong> ${totalRawScore} / ${maxScore} <br>
+            <strong>Overall Risk Score(weighted) :</strong> ${totalWeightedScore} / ${maxScore}`;
 
         const breakdownList = document.getElementById("breakdown-list");
         breakdownList.innerHTML = ""; // Clear previous entries
 
         weightedRiskScores.forEach(({ key, prevalence, weight, riskScore, weightedScore }) => {
+            console.log(`Debug: ${key} -> Prevalence: ${prevalence}, Weight: ${weight}, Risk Score: ${riskScore}, Weighted Score: ${weightedScore}`);
+    
+            
             const listItem = document.createElement("li");
 
-            const humanReadableKey = factorNames[key] || key; // Fallback to the raw key if not found
+            const humanReadableKey = factorNames[key] || key;
 
             listItem.innerHTML = `
                 <strong>${humanReadableKey}:</strong>
                 Prevalence: <em>${prevalence.toFixed(2)}%</em>, 
-                Weight: <em>${weight.toFixed(2)}</em>, 
+                Weight: <em>${(weight * 100).toFixed(2)}%</em>, 
                 Risk Score: <em>${riskScore}</em>, 
                 Weighted Score: <em>${weightedScore.toFixed(2)}</em>
             `;
@@ -443,23 +497,8 @@ function getAgeGroup(value) {
 
 function getRiskScore(prevalence) {
     if (prevalence <= 5) return 1;   // Very Low
-    if (prevalence <= 10) return 2;  // Low
-    if (prevalence <= 15) return 3;
-    if (prevalence <= 20) return 4;
-    if (prevalence <= 25) return 5;  // Slightly Moderate
-    if (prevalence <= 30) return 6;
-    if (prevalence <= 35) return 7;
-    if (prevalence <= 40) return 8;  // Moderate
-    if (prevalence <= 45) return 9;
-    if (prevalence <= 50) return 10; // Slightly High
-    if (prevalence <= 55) return 11;
-    if (prevalence <= 60) return 12;
-    if (prevalence <= 65) return 13; // High
-    if (prevalence <= 70) return 14;
-    if (prevalence <= 75) return 15; // Very High
-    if (prevalence <= 80) return 16;
-    if (prevalence <= 85) return 17;
-    if (prevalence <= 90) return 18;
-    if (prevalence <= 95) return 19;
-    return 20; // Extremely High
+    if (prevalence <= 15) return 5;  // Low
+    if (prevalence <= 30) return 10; // Moderate
+    if (prevalence <= 50) return 15; // High
+    return 20; // Very High
 }
