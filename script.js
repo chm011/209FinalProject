@@ -21,7 +21,7 @@ d3.json("preprocessed_demographic_data.json")
 const svg = d3.select("svg");
 const width = +svg.attr("width");
 const height = +svg.attr("height");
-const margin = { top: 50, right: 60, bottom:200, left: 100 };
+const margin = { top: 50, right: 20, bottom:200, left: 100 };
 
 const chartWidth = width - margin.left - margin.right;
 const chartHeight = height - margin.top - margin.bottom;
@@ -38,13 +38,57 @@ const colorScale = d3.scaleOrdinal().domain(["Diabetes", "NonDiabetes"]).range([
 const xAxisGroup = g.append("g").attr("transform", `translate(0,${chartHeight})`);
 const yAxisGroup = g.append("g");
 
+const xAxisLabel = g.append("text")
+    .attr("x", chartWidth / 2)
+    .attr("y", chartHeight + 190)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .attr("fill", "#333")
+    .text("Demographic Category"); 
+
+const yAxisLabel = g.append("text")
+    .attr("x", -chartHeight / 2)
+    .attr("y", -60)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .attr("fill", "#333")
+    .text("Percentage (%)");
+    
 // Tooltip
 const tooltip = d3.select("body")
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
+//legend
+const legendData = [
+    { label: "Diabetes", color: "#ff6f61" },
+    { label: "NonDiabetes", color: "#69b3a2" }
+];
+const legendContainer = d3.select("#legend-container");
 
+const legendItems = legendContainer.selectAll(".legend-item")
+    .data(legendData)
+    .enter()
+    .append("div")
+    .attr("class", "legend-item");
+
+// Add Color Boxes to Legend Items
+legendItems.append("div")
+    .style("width", "10px")
+    .style("height", "10px")
+    .style("background-color", d => d.color)
+    .style("border-radius", "2px") //
+    .style("margin-right", "10px")
+    .style("flex-shrink", "0");
+
+// Add Labels to Legend Items
+legendItems.append("span")
+    .text(d => d.label)
+    .style("font-size", "14px")
+    .style("font-family", "'Inter', sans-serif")
+    .style("color", "#333");
 
 //update chart
 function updateChart(demographic, data) {
@@ -56,25 +100,9 @@ function updateChart(demographic, data) {
         g.selectAll("*").remove(); // Clear the chart
         return;
     }
-    /*
-    if (demographic === "Income") {
-        const incomeOrder = [
-            "< $10,000",
-            "$10,000 - $15,000",
-            "$15,000 - $20,000",
-            "$20,000 - $25,000",
-            "$25,000 - $35,000",
-            "$35,000 - $50,000",
-            "$50,000 - $75,000",
-            "> $75,000"
-        ];
-        filteredData.sort((a, b) => incomeOrder.indexOf(a.Category) - incomeOrder.indexOf(b.Category));
-    }*/
-   
-       
     if (demographic === "Education") {
         const EducationOrder = [
-            "Never attended school or Kindergarten",
+            "Never attended school",
             "Elementary School",
             "Some high school",
             "High school graduate",
@@ -99,13 +127,47 @@ function updateChart(demographic, data) {
         .selectAll("text")
         .attr("transform", "rotate(-45)")
         .style("text-anchor", "end")
-        .style("font-size","11.5px");
+        .style("font-size","13px");
+
     yAxisGroup.transition().call(d3.axisLeft(yScale))
         .selectAll("text")
-        .style("font-size","11.5px");
+        .style("font-size","13px");
 
     // Render bars with stackedData
     renderBars(stackedData, filteredData);
+}
+function wrapText(selection, width) {
+    selection.each(function() {
+        const text = d3.select(this);
+        const words = text.text().split(/\s+/).reverse();
+        let word;
+        const line = [];
+        const lineHeight = 1.1; // ems for line spacing
+        const y = text.attr("y");
+        const dy = parseFloat(text.attr("dy")) || 0;
+
+        let tspan = text.text(null)
+            .append("tspan")
+            .attr("x", 0)
+            .attr("y", y)
+            .attr("dy", `${dy}em`);
+
+        while ((word = words.pop())) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line.length = 0;
+                line.push(word);
+                tspan = text.append("tspan")
+                    .attr("x", 0)
+                    .attr("y", y)
+                    .attr("dy", `${lineHeight}em`)
+                    .text(word);
+            }
+        }
+    });
 }
 
 function renderBars(stackedData, filteredData) {
@@ -119,7 +181,6 @@ function renderBars(stackedData, filteredData) {
 
     const bars = groupEnter.merge(groups).selectAll("rect").data(d => d);
 
-
     
     bars.enter()
         .append("rect")
@@ -128,31 +189,46 @@ function renderBars(stackedData, filteredData) {
         .attr("y", d => yScale(d[1]))
         .attr("height", d => Math.max(0, yScale(d[0]) - yScale(d[1])))
         .attr("width", xScale.bandwidth())
-        .on("mouseover", (event, d) => {
+        .on("mouseover", function (event, d) {
             const key = d3.select(event.target.parentNode).datum().key; // 'Diabetes' or 'NonDiabetes'
-            const count = key === "Diabetes" ? d.data.Diabetes_binary_count : d.data.NonDiabetes_count; // Access count
-            const total = d.data.Subgroup_total; // Total for the category
-            const percentage = (count / d.data.Subgroup_total) * 100;// Percentage of diabetes/ nondiabetes within the subgroup
+            const count = key === "Diabetes" ? d.data.Diabetes_binary_count : d.data.NonDiabetes_count;
+            const total = d.data.Subgroup_total;
+            const percentage = (count / total) * 100;
 
-            tooltip.style("opacity", 1)
-                .html(`
-                    <strong>Total Count in Subgroup:</strong> ${total}<br>
-                    <strong>${key === "Diabetes" ? "With Diabetes (Count)" : "Without Diabetes (Count)"}:</strong> ${count}<br>
-                    <strong>${key === "Diabetes" ? "% with Diabetes" : "% without Diabetes"}:</strong> ${percentage.toFixed(2)}%
-                `)
-                .style("left", `${event.pageX + 10}px`)
-                .style("top", `${event.pageY - 20}px`);
+            tooltip.transition().duration(200).style("opacity", 1);
+            tooltip.html(`
+                <strong>Total Count in Subgroup:</strong> ${total}<br>
+                <strong>${key === "Diabetes" ? "With Diabetes (Count)" : "Without Diabetes (Count)"}:</strong> ${count}<br>
+                <strong>${key === "Diabetes" ? "% with Diabetes" : "% without Diabetes"}:</strong> ${percentage.toFixed(2)}%
+            `)
+                .style("left", `${event.pageX + 15}px`)
+                .style("top", `${event.pageY - 15}px`);
+
+            // Change color on hover
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("fill", key === "Diabetes" ? "#e65548" : "#458f7b");
         })
-        .on("mouseout", () => 
-            tooltip.style("opacity", 0));
+        .on("mousemove", function (event) {
+            tooltip.style("left", `${event.pageX + 15}px`)
+                .style("top", `${event.pageY - 15}px`);
+        })
+        .on("mouseout", function () {
+            tooltip.transition().duration(300).style("opacity", 0);
 
+            // Revert color
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("fill", d => colorScale(d3.select(this.parentNode).datum().key));
+        });
 
     bars.exit().remove();
     groups.exit().remove();
 
     console.log("Rendering Complete for Demographic:", demographic);
 }
-
 
 
 
@@ -415,8 +491,9 @@ function updateRisk() {
 
         riskResult.innerHTML = `<strong>Your estimated diabetes risk is ${overallRiskPercentage.toFixed(2)}%.</strong>`;
         riskScore.innerHTML = `
-            <strong>Total Raw Score:</strong> ${totalRawScore} / ${maxScore} <br>
-            <strong>Overall Risk Score(weighted) :</strong> ${totalWeightedScore} / ${maxScore}`;
+            <div class="score-line"><strong>Total Raw Score:</strong> ${totalRawScore} / ${maxScore}</div>
+            <div class="score-line"><strong>Overall Risk Score (weighted):</strong> ${totalWeightedScore.toFixed(2)} / ${maxScore}</div>`;
+
         
         const breakdownList = document.getElementById("breakdown-list");
         breakdownList.innerHTML = "";
@@ -427,10 +504,10 @@ function updateRisk() {
 
             listItem.innerHTML = `
                 <strong>${humanReadableKey}:</strong>
-                Prevalence: <em>${prevalence.toFixed(2)}%</em>, 
-                Weight: <em>${(weight * 100).toFixed(2)}%</em>, 
-                Risk Score: <em>${riskScore}</em>, 
-                Weighted Score: <em>${weightedScore.toFixed(2)}</em>
+                Prevalence: ${prevalence.toFixed(2)}%, 
+                Weight: ${(weight * 100).toFixed(2)}%, 
+                Risk Score: ${riskScore}, 
+                Weighted Score: ${weightedScore.toFixed(2)}
             `;
             breakdownList.appendChild(listItem);
         });

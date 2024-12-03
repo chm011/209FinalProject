@@ -26,8 +26,12 @@
         Data Soruce: <a href = "https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data?select=diabetes_012_health_indicators_BRFSS2015.csv">https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data?select=diabetes_012_health_indicators_BRFSS2015.csv </a>
     </p>
     <br></br>
+
+
+    <div class="graph-section">
+    <!-- Graph Section -->
     <h2>Diabetes Prevalence by General Demographic</h2>
-    <div style = "padding: 10px;">
+    <div id="demographic-container">
         <label for="demographic">Select Demographic:</label>
         <select id="demographic">
             <option value="Education">Education</option>
@@ -36,8 +40,13 @@
             <option value="Sex">Sex</option>
         </select>
     </div>
-    <svg width="800" height="500"></svg>
-    <div class="tooltip" style="opacity: 0;"></div>
+    <div style="display: flex; align-items: center;">
+        <svg width="1200" height="800"></svg>
+        <div id="legend-container"></div>
+    </div>
+        <div class="tooltip" style="opacity: 0;"></div>
+    
+</div>
 <br></br>
 <br></br>
 
@@ -64,15 +73,16 @@
 
 
 
-<!--Diabetes Risk Calculator-->  
+<!--Diabetes Risk Calculator--> 
+
+<div class="calculator-section">
+    <div class="calulator-header">
 <h2>Diabetes Risk Calculator</h2>
 <p style="font-size: 14px;padding: 0px 20px;">
     This calculator was made based on a kaggle set. It is meant to give an idea based on the data, and its prevalence rate and risk calculated are not meant to be extrapolated, but only to understand the risk further. 
-
 </p>
 </div>
-
-
+<div class="calculator-parts">
 <div class="card">
     <!-- Dropdown and Sliders -->
     <div class="slider-container">
@@ -151,36 +161,36 @@
             <option value="1">Yes</option>
         </select>
     </div>
-    <button class="button" onclick="calculateRisk()">Calculate Risk</button>
+    
 </div>
 
-<div>
 <!-- Risk Result -->
-
-<div id="risk-output" class="card">
-    <div id="risk-result"></div>
-    <div id="risk-score"></div>
-    <br></br>
-    <button id="toggle-breakdown-btn">Expand to See More</button>
-    <div id="breakdown-container" style="display: none;">
-        <h4>Breakdown by Factor:</h4>
-        <ul id="breakdown-list" style="font-size: 13px;"></ul>
+<div id="risk-output" class="centered-card">
+    <div class="risk-info-wrapper">
+        <div id="risk-result"></div>
+        <div id="risk-score"></div>
+</div>
+<button id="toggle-breakdown-btn">Expand to See More</button>
+<div id="breakdown-container" style="display: none;">
+    <h4>Breakdown by Factor:</h4>
+    <ul id="breakdown-list" style="font-size: 13px;"></ul>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
+</div>
+</div>
 
 
 
 <br></br>
 <br></br>
+
+
+
+
+
+
+<!-- Writeup Section -->
+ <div class="write-up-section">
 <h3>Write Up for Prototype:</h3>
 <p style="font-size: 14px;padding: 20px;">
     I chose this diabaetes dataset from the UCI respository which sourced from a kaggle dataset. I am interested in what these data will show, and how accurate the anayltic results are when compared to the real word.
@@ -195,6 +205,6 @@
     <br></br>
     For this calculator, importing the json file and adjusting to make it work took a tremendous time as it was my first time implementing. The data won't load or the calculator wouldn't work dynamically. It took a lot of tries for it to finally work. And to design and figure out the a simple system that would work for the calculator was also challenging.
     </p>
-
+</div>
 </body>
 </html>
