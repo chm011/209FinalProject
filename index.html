@@ -19,19 +19,30 @@
     <div class="container">
     <h1>Diabetes Health Indicators (2014)</h1>
         <p style="font-size: 14px;padding: 0px 20px;">
-        Diabetes is a chronic disease that impact many people world wide. Being diagnosed with diabetes means you have hyperglycemia or high blood sugar. Typically diagnosis is made when someone's Hb1Ac is above 6.5% or  blood sugar is higher than 200mg/dL in more than 1 reading. There are greater than 133 million Americans with diabetes or prediabetes, which makes it more crucial to understand the important facors that could increase our risks of getting it. I believe that the following visualizations will bring us closer to understanding the factors that are related to it, and hence the following was done to help demonstrate those points. 
-        <br></br>
-        Information Source: <a href= "https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes"> https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes</a>
-        <br></br>
+            Diabetes is a chronic disease that impacts millions worldwide, characterized by hyperglycemia or high blood sugar. Typically, diabetes is diagnosed when HbA1c levels exceed 6.5% or blood sugar levels surpass 200 mg/dL on multiple readings. In 2019, over 133 million Americans were living with diabetes or prediabetes. Among them, approximately 37.3 million, or 11.3% of the U.S. population, had diabetes, with over one in four individuals over 65 affected. Alarmingly, nearly one in four adults with diabetes are unaware of their condition. Around 90% to 95% of diabetes cases are type 2 diabetes, typically linked to lifestyle factors. In 2019, roughly 96 million adults, or 38% of U.S. adults, were diagnosed with prediabetes, underscoring the importance of understanding risk factors for type 2 diabetes.
+
+            <br>
+            <br/>
+
+            Since 2022, diabetes prevalence among adults aged 18 and older has reached 14%, a notable increase from 7% in 1990. Despite the rising number of cases, more than half (59%) of adults aged 30 and over with diabetes were not taking medication in 2022, with particularly low treatment coverage in low- and middle-income countries. Diabetes was the direct cause of 1.6 million deaths in 2021, nearly half of which (47%) occurred before the age of 70. Additionally, diabetes contributed to 530,000 deaths from kidney disease and accounted for about 11% of cardiovascular deaths. Since 2000, mortality rates from diabetes have increased, in contrast to a 20% decline in the probability of dying from the four major non-communicable diseases (cardiovascular disease, cancer, chronic respiratory disease, and diabetes) between 2000 and 2019. These statistics highlight the growing impact of diabetes and the need for effective prevention strategies.
+            <br>
+            <br/>
+            To gain insights into key factors contributing to diabetes risk, I analyzed a diabetes dataset from the UCI repository, originally sourced from Kaggle. My goal was to explore the insights this data provides and assess the accuracy of analytical results compared to real-world statistics. Below, I describe two visualizations I created to better understand these factors and their relationships to diabetes.
+        <br>
+        <br/>
+
         Data Soruce: <a href = "https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data?select=diabetes_012_health_indicators_BRFSS2015.csv">https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data?select=diabetes_012_health_indicators_BRFSS2015.csv </a>
     </p>
     <br></br>
-
+    <br>
 
     <div class="graph-section">
     <!-- Graph Section -->
     <h2>Diabetes Prevalence by General Demographic</h2>
     <div id="demographic-container">
+        <p>
+        This first visualization shows the diabetes prevalence rate within the dataset, which is based on 70,692 survey responses. It provides an overview of the demographics related to age, sex, income, and education, along with the distribution of these demographic factors. Age and sex for general insight are included, as well as income and education, which, while less impactful in a clinical setting compared to lifestyle and physical health factors, are still worth exploring. The visualization allows viewers to filter by demographic category and hover over the bars to see the exact counts of people with or without diabetes in each subgroup, along with the total population in each subgroup.
+        </p>
         <label for="demographic">Select Demographic:</label>
         <select id="demographic">
             <option value="Education">Education</option>
@@ -39,12 +50,17 @@
             <option value="Age">Age</option>
             <option value="Sex">Sex</option>
         </select>
+
+        
     </div>
     <div style="display: flex; align-items: center;">
         <svg width="1200" height="800"></svg>
+        
         <div id="legend-container"></div>
     </div>
         <div class="tooltip" style="opacity: 0;"></div>
+        <p style="font-size: 14px;padding: 0px 20px;">
+    </p>
     
 </div>
 <br></br>
@@ -78,8 +94,14 @@
 <div class="calculator-section">
     <div class="calulator-header">
 <h2>Diabetes Risk Calculator</h2>
-<p style="font-size: 14px;padding: 0px 20px;">
+<p>
     This calculator was made based on a kaggle set. It is meant to give an idea based on the data, and its prevalence rate and risk calculated are not meant to be extrapolated, but only to understand the risk further. 
+    <br>
+    <br>
+     I processed the data to determine prevalence rates for each category and subgroup, which I used to create a scoring system. Each prevalence rate was assigned a risk score using predefined thresholds, and I calculated correlation coefficients to determine each factor's influence. These coefficients were used to weight the risk scores, which were summed, averaged, and converted into a percentage to provide an overall risk score for diabetes. 
+     <br>
+     <br>
+     These visualizations aim to help us better understand factors influencing diabetes prevalence and risk, which is crucial in addressing this growing health issue.
 </p>
 </div>
 <div class="calculator-parts">
@@ -177,34 +199,36 @@
     </div>
 </div>
 </div>
+
+<p>
+<strong>Risk Factors for Type 2 Diabetes</strong>
+<br>
+Your chances of developing type 2 diabetes depend on a combination of risk factors. Risk factors related to family history, age, race, or ethnicity can't be changed; however, lifestyle changes are the best way to prevent or delay the onset diabetes. You may be able to avoid or delay diabetes just by maintaining a healthier weight and being physically active.
+
+Below are some of the risk factors deem more likely than others:
+<li>overweight or have obesity</li>
+<li>have a familiy history of diabetes</li>
+<li> are descendants of African American, American Indian, Asian American, Hispanic/Latino, or Pacific Islander</li>
+<li>are physically inactive</li>
+<li>have had gestational diabetes or prediabetes</li>
+
+</p>
 </div>
 
 
 
-<br></br>
-<br></br>
 
 
+<p class="citations">
 
+<strong>Citations(AMA) for the backgrond information and other information:</strong>
+<br>
+1. World. Diabetes. Who.int. Published November 14, 2024. <u>https://www.who.int/news-room/fact-sheets/detail/diabetes</u>
+<br>
+2. NIDDK. National Institute of Diabetes and Digestive and Kidney Diseases. Published December 3, 2024. <u>https://www.niddk.nih.gov/health-information/diabetes</u>
+‌
 
-
-
-<!-- Writeup Section -->
- <div class="write-up-section">
-<h3>Write Up for Prototype:</h3>
-<p style="font-size: 14px;padding: 20px;">
-    I chose this diabaetes dataset from the UCI respository which sourced from a kaggle dataset. I am interested in what these data will show, and how accurate the anayltic results are when compared to the real word.
-    <br></br>
-    In the prototype, two visualizations are done so far. 
-    <br></br>
-    The first one showing the diabetes prevalence rate among the dataset, which were based off of 70,692 survey responses. This was done to give an overall idea to what the demographics looks like in terms of age, sex, income, and education, and also to see the distrubution of just the demographics itself. I chose to just include age and sex for a general idea, and included income and education, because I thought it would be an interesting data to look at, even though it isn't generally seen as an heavily impacting factor in the clinical world, especially since comparing to lifestyle factors ad physical health factors.  There is a filter that audience can select to choose which demograhpic they wish to see, and when hovering over bars, it will show the exact counts of people with or without diabetes in each subgroup and how many people are in each subgroup.   
-    <br></br>
-    The difficulty of this mainly due to the bar heights, whenever I am trying adjust the colors to reflect having diabetes or not, the bar heights keep jumping to 100% to account for the diabetes percentage to be 100%, instead of the subgroup population I was tryign to show. 
-    <br></br>
-    The second one is a diabetes risk calculator. I processed the data to find prevalence rate of each categories and subgroups, and turned it into a scoring system. Each prevalence rate for each factor is turned into a risk score using a predefined threshhold. Then, I further processed the data to find correlation coefficients help me weigh which factors are more influencing. That integrated that into the calculator to weighted risk scores through  multiplying the weight by the risk score. The weighted scores are then summed, averaged, and converted into the percentage to show the overall risk for diabetes. I believe machine learning would have been a better approach to calculate scores, as the scores right now are still false high, and doesn't reflect nor can be used in real-wrod. But due to the limited time factor,  to write an API and integrate it into the graph will be far too complex. 
-    <br></br>
-    For this calculator, importing the json file and adjusting to make it work took a tremendous time as it was my first time implementing. The data won't load or the calculator wouldn't work dynamically. It took a lot of tries for it to finally work. And to design and figure out the a simple system that would work for the calculator was also challenging.
-    </p>
+</p>
 </div>
 </body>
 </html>
